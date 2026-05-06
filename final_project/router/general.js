@@ -5,7 +5,23 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 const axios = require('axios');
 
-// Task 10: Get the book list available in the shop using Async/Await
+// Task 6: Register a new user
+public_users.post("/register", (req, res) => {
+    const { username, password } = req.body;
+
+    if (username && password) {
+        const exists = users.find((user) => user.username === username);
+        if (!exists) {
+            users.push({ "username": username, "password": password });
+            return res.status(200).json({ message: "User successfully registered. Now you can login" });
+        } else {
+            return res.status(404).json({ message: "User already exists!" });
+        }
+    }
+    return res.status(404).json({ message: "Unable to register user (Username/Password missing)." });
+});
+
+// Task 10: Get the book list available in the shop using Async-Await
 public_users.get('/', async function (req, res) {
     try {
         const getBooks = () => Promise.resolve(books);
@@ -16,7 +32,7 @@ public_users.get('/', async function (req, res) {
     }
 });
 
-// Task 11: Get book details based on ISBN using Async/Await
+// Task 11: Get book details based on ISBN using Async-Await
 public_users.get('/isbn/:isbn', async function (req, res) {
     const isbn = req.params.isbn;
     try {
@@ -36,7 +52,7 @@ public_users.get('/isbn/:isbn', async function (req, res) {
     }
 });
 
-// Task 12: Get book details based on Author using Async/Await
+// Task 12: Get book details based on Author using Async-Await
 public_users.get('/author/:author', async function (req, res) {
     const author = req.params.author;
     try {
@@ -60,7 +76,7 @@ public_users.get('/author/:author', async function (req, res) {
     }
 });
 
-// Task 13: Get all books based on Title using Async/Await
+// Task 13: Get all books based on Title using Async-Await
 public_users.get('/title/:title', async function (req, res) {
     const title = req.params.title;
     try {
@@ -84,7 +100,7 @@ public_users.get('/title/:title', async function (req, res) {
     }
 });
 
-// Task 5: Get book review (Sincron, conform cerinței inițiale)
+// Task 5: Get book review based on ISBN
 public_users.get('/review/:isbn', function (req, res) {
     const isbn = req.params.isbn;
     if (books[isbn]) {
@@ -92,20 +108,6 @@ public_users.get('/review/:isbn', function (req, res) {
     } else {
         res.status(404).json({ message: "Book not found" });
     }
-});
-
-// Task 6: Register User
-public_users.post("/register", (req, res) => {
-    const { username, password } = req.body;
-    if (username && password) {
-        const exists = users.find(u => u.username === username);
-        if (!exists) {
-            users.push({ username, password });
-            return res.status(200).json({ message: "User successfully registered. Now you can login" });
-        }
-        return res.status(400).json({ message: "User already exists!" });
-    }
-    return res.status(400).json({ message: "Username or password missing" });
 });
 
 module.exports.general = public_users;
